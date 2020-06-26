@@ -25,7 +25,9 @@ class Grid extends React.Component {
     for (var i = 0; i < this.props.rows; i++) {
       for (var j = 0; j < this.props.cols; j++) {
         let boxId = i + "_" + j;
-        boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
+        boxClass = this.props.gridFull[i][j]
+          ? `box ${this.props.color}`
+          : "box off";
         rowsArr.push(
           <Box
             boxClass={boxClass}
@@ -49,10 +51,27 @@ class Buttons extends React.Component {
   handleSelect = (e) => {
     this.props.gridSize(e);
   };
+  handleColor = (e) => {
+    console.log(this.props.color)
+    this.props.boxColor(e);
+  };
   render() {
     return (
       <div className="center">
         <ButtonToolbar>
+          <DropdownButton
+            title="Color"
+            id="size-menu"
+            onSelect={this.handleColor}
+          >
+            <Dropdown.Item eventKey="green">Green</Dropdown.Item>
+            <Dropdown.Item eventKey="orange">Orange</Dropdown.Item>
+            <Dropdown.Item eventKey="red">Red</Dropdown.Item>
+            <Dropdown.Item eventKey="white">White</Dropdown.Item>
+            <Dropdown.Item eventKey="pink">Pink</Dropdown.Item>
+            <Dropdown.Item eventKey="black">Black</Dropdown.Item>
+            <Dropdown.Item eventKey="blue">Blue</Dropdown.Item>
+          </DropdownButton>
           <button className="btn-default" onClick={this.props.playButton}>
             Play
           </button>
@@ -85,6 +104,7 @@ class Buttons extends React.Component {
     );
   }
 }
+
 class Main extends React.Component {
   constructor() {
     super();
@@ -92,6 +112,7 @@ class Main extends React.Component {
     this.rows = 30;
     this.cols = 50;
     this.state = {
+      color: "green",
       generation: 0,
       gridFull: Array(this.rows)
         .fill()
@@ -141,6 +162,7 @@ class Main extends React.Component {
       gridFull: grid,
       generation: 0,
     });
+    this.pauseButton();
   };
   gridSize = (size) => {
     switch (size) {
@@ -157,6 +179,33 @@ class Main extends React.Component {
         this.rows = 50;
     }
     this.clear();
+  };
+  boxColor = (e) => {
+    // switch (e) {
+    //   case "orange":
+    //     this.color = "orange";
+    //     break;
+    //   case "red":
+    //     this.color = "red";
+    //     break;
+    //   case "white":
+    //     this.color = "white";
+    //     break;
+    //   case "pink":
+    //     this.color = "pink";
+    //     break;
+    //   case "black":
+    //     this.color = "black";
+    //     break;
+    //   case "blue":
+    //     this.color = "blue";
+    //     break;
+    //   default:
+    //     this.color = "green";
+    // }
+    this.setState({
+      color: e
+    })
   };
   play = () => {
     let g = this.state.gridFull;
@@ -185,7 +234,6 @@ class Main extends React.Component {
   };
   componentDidMount() {
     this.seed();
-    this.playButton();
   }
   render() {
     return (
@@ -195,10 +243,13 @@ class Main extends React.Component {
           gridFull={this.state.gridFull}
           rows={this.rows}
           cols={this.cols}
+          color={this.state.color}
           selectBox={this.selectBox}
         />
         <h2>Generations: {this.state.generation}</h2>
         <Buttons
+          boxColor={this.boxColor}
+          color={this.color}
           playButton={this.playButton}
           pauseButton={this.pauseButton}
           slow={this.slow}
